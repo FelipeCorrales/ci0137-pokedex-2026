@@ -6,12 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pokédex - Lista de Pokémon</title>
 
-  <!-- Favicon en tres formatos: SVG y PNG se declaran aquí; el .ico vive en la raíz y el navegador lo pide solo, sin <link> -->
   <link rel="icon" type="image/svg+xml" href="assets/pokeball.svg">
   <link rel="icon" type="image/png" href="assets/pokeball.png">
+  <!-- favicon.ico vive en la raiz: el navegador lo pide solo, sin <link> -->
 </head>
 
 <body>
+
   <header>
     <p>
       <a class="logo" href="./">
@@ -20,7 +21,6 @@
     </p>
 
     <nav>
-      <!-- Enlaces de navegación principal del sitio -->
       <ul>
         <li><a href="./" accesskey="p">Pokédex</a></li>
         <li><a href="perfil-entrenador.html">Perfil de entrenador</a></li>
@@ -36,100 +36,150 @@
     <section id="buscador">
       <h2>Buscar y filtrar</h2>
       <p>Buscá por nombre o filtrá por tipo para encontrar un Pokémon más rápido.</p>
-      <!-- Aqui va el formulario -->
+
+      <search>
+        <form class="buscador" action="./" method="get">
+          <fieldset>
+            <legend>Criterios de búsqueda</legend>
+
+            <label for="nombre">Nombre</label>
+            <input type="search" id="nombre" name="nombre">
+
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+              <option value="">Todos los tipos</option>
+              <option value="planta">Planta</option>
+              <option value="fuego">Fuego</option>
+              <option value="agua">Agua</option>
+              <option value="electrico">Eléctrico</option>
+              <option value="veneno">Veneno</option>
+              <option value="volador">Volador</option>
+            </select>
+
+            <label for="orden">Ordenar por</label>
+            <select id="orden" name="orden">
+              <option value="numero-asc" selected>Número (menor a mayor)</option>
+              <option value="numero-desc">Número (mayor a menor)</option>
+              <option value="nombre-asc">Nombre (A-Z)</option>
+              <option value="nombre-desc">Nombre (Z-A)</option>
+              <option value="tamano-desc">Tamaño (más alto primero)</option>
+              <option value="tamano-asc">Tamaño (más bajo primero)</option>
+            </select>
+
+            <button type="submit">Buscar</button>
+            <button type="reset">Limpiar</button>
+
+            <p>
+              <input type="checkbox" id="solo-capturados" name="solo-capturados" value="si">
+              <label for="solo-capturados">Mostrar solo los que ya capturé</label>
+            </p>
+
+            <fieldset>
+              <legend>Etapa evolutiva</legend>
+
+              <input type="radio" id="etapa-todas" name="etapa" value="todas" checked>
+              <label for="etapa-todas">Todas</label>
+
+              <input type="radio" id="etapa-inicial" name="etapa" value="inicial">
+              <label for="etapa-inicial">Solo formas iniciales</label>
+
+              <input type="radio" id="etapa-final" name="etapa" value="final">
+              <label for="etapa-final">Solo formas finales</label>
+            </fieldset>
+          </fieldset>
+        </form>
       </search>
     </section>
 
     <section id="lista-pokemon">
       <h2>Pokémon disponibles</h2>
 
-      <!-- Lista no ordenada: cada tarjeta es un enlace con una imagen (con su alt) y el nombre del Pokémon -->
-      <ul>
-        <li>
-          <a href="detalle-pokemon-bulbasaur.html">
-            <img src="assets/bulbasaur.png" alt="Bulbasaur" width="96" height="96">
-            <span>#001</span>
-            <span>Bulbasaur</span>
+      <ul class="pokemon-list">
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-bulbasaur.html">
+            <img class="pokemon-card__image" src="assets/bulbasaur.png" alt="Bulbasaur" width="96" height="96">
+            <span class="pokemon-card__number">#001</span>
+            <span class="pokemon-card__name">Bulbasaur</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-ivysaur.html">
-            <img src="assets/ivysaur.png" alt="Ivysaur" width="96" height="96">
-            <span>#002</span>
-            <span>Ivysaur</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-ivysaur.html">
+            <img class="pokemon-card__image" src="assets/ivysaur.png" alt="Ivysaur" width="96" height="96">
+            <span class="pokemon-card__number">#002</span>
+            <span class="pokemon-card__name">Ivysaur</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-venusaur.html">
-            <img src="assets/venusaur.png" alt="Venusaur" width="96" height="96">
-            <span>#003</span>
-            <span>Venusaur</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-venusaur.html">
+            <img class="pokemon-card__image" src="assets/venusaur.png" alt="Venusaur" width="96" height="96">
+            <span class="pokemon-card__number">#003</span>
+            <span class="pokemon-card__name">Venusaur</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-charmander.html">
-            <img src="assets/charmander.png" alt="Charmander" width="96" height="96">
-            <span>#004</span>
-            <span>Charmander</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-charmander.html">
+            <img class="pokemon-card__image" src="assets/charmander.png" alt="Charmander" width="96" height="96">
+            <span class="pokemon-card__number">#004</span>
+            <span class="pokemon-card__name">Charmander</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-charmeleon.html">
-            <img src="assets/charmeleon.png" alt="Charmeleon" width="96" height="96">
-            <span>#005</span>
-            <span>Charmeleon</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-charmeleon.html">
+            <img class="pokemon-card__image" src="assets/charmeleon.png" alt="Charmeleon" width="96" height="96">
+            <span class="pokemon-card__number">#005</span>
+            <span class="pokemon-card__name">Charmeleon</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-charizard.html">
-            <img src="assets/charizard.png" alt="Charizard" width="96" height="96">
-            <span>#006</span>
-            <span>Charizard</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-charizard.html">
+            <img class="pokemon-card__image" src="assets/charizard.png" alt="Charizard" width="96" height="96">
+            <span class="pokemon-card__number">#006</span>
+            <span class="pokemon-card__name">Charizard</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-squirtle.html">
-            <img src="assets/squirtle.png" alt="Squirtle" width="96" height="96">
-            <span>#007</span>
-            <span>Squirtle</span>
+        <!-- Única ficha de detalle construida en clase. Las demás quedan de ejercicio. -->
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-squirtle.html">
+            <img class="pokemon-card__image" src="assets/squirtle.png" alt="Squirtle" width="96" height="96">
+            <span class="pokemon-card__number">#007</span>
+            <span class="pokemon-card__name">Squirtle</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-wartortle.html">
-            <img src="assets/wartortle.png" alt="Wartortle" width="96" height="96">
-            <span>#008</span>
-            <span>Wartortle</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-wartortle.html">
+            <img class="pokemon-card__image" src="assets/wartortle.png" alt="Wartortle" width="96" height="96">
+            <span class="pokemon-card__number">#008</span>
+            <span class="pokemon-card__name">Wartortle</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-blastoise.html">
-            <img src="assets/blastoise.png" alt="Blastoise" width="96" height="96">
-            <span>#009</span>
-            <span>Blastoise</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-blastoise.html">
+            <img class="pokemon-card__image" src="assets/blastoise.png" alt="Blastoise" width="96" height="96">
+            <span class="pokemon-card__number">#009</span>
+            <span class="pokemon-card__name">Blastoise</span>
           </a>
         </li>
 
-        <li>
-          <a href="detalle-pokemon-pikachu.html">
-            <img src="assets/pikachu.png" alt="Pikachu" width="96" height="96">
-            <span>#025</span>
-            <span>Pikachu</span>
+        <li class="pokemon-card">
+          <a class="pokemon-card__link" href="detalle-pokemon-pikachu.html">
+            <img class="pokemon-card__image" src="assets/pikachu.png" alt="Pikachu" width="96" height="96">
+            <span class="pokemon-card__number">#025</span>
+            <span class="pokemon-card__name">Pikachu</span>
           </a>
         </li>
       </ul>
     </section>
 
     <nav id="paginacion">
-      <!-- Lista ordenada: a diferencia de la de arriba, aquí el orden sí importa -->
-      <ol>
+      <ol class="paginacion">
         <li><a href="./">1</a></li>
         <li><a href="#">2</a></li>
         <li><a href="#">3</a></li>
@@ -138,7 +188,6 @@
   </main>
 
   <footer>
-    <!-- Elementos de texto con semántica especial: <abbr> marca una sigla junto a su expansión (title) y <time> da una fecha en formato legible por máquina (datetime) -->
     <p><small>Proyecto académico del curso Desarrollo de Aplicaciones Web
         (<abbr title="Curso de Informática 0137">CI-0137</abbr>),
         Escuela de Ciencias de la Computación e Informática,
@@ -149,7 +198,6 @@
         Game Freak y The Pokémon Company. Este sitio no tiene ninguna relación con
         ellos y se usa únicamente con fines educativos.</small></p>
 
-    <!-- Enlaces externos: target="_blank" abre en pestaña nueva y rel="noopener" evita que esa pestaña controle esta página -->
     <p><small>Ilustraciones y sprites tomados del repositorio
         <a href="https://github.com/PokeAPI/sprites" target="_blank" rel="noopener">PokeAPI/sprites</a>.
         Datos de referencia consultados en
