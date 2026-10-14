@@ -1,20 +1,25 @@
 // =============================================================
-//  ficha.js  —  UNA sola ficha para todos los Pokémon.
-//  Lee el id de la dirección (detalle.html?id=7) y arma la página.
-//  Lo escribimos juntos en clase. Reemplaza los detalle-pokemon-*.html.
+//  ficha.js  —  Una sola ficha para todos los Pokémon.
+//  Lee el id de la dirección (detalle.html?id=7) y arma la página
+//  con la MISMA estructura y clases del HTML original.
+//  Reemplaza a los archivos detalle-pokemon-*.html.
 // =============================================================
-
-// De datos.js:
-//   buscarPorId   -> encuentra un Pokémon por su id
-//   numeroPokedex -> "#007";   totalStats -> suma de las estadísticas
 import { pokedex, buscarPorId, numeroPokedex, totalStats } from './datos.js';
 
-const ficha = document.querySelector('#ficha-pokemon');          // el <article> vacío
-const carrusel = document.querySelector('#carrusel .carrusel');  // el <ul> del carrusel
-
-const params = new URLSearchParams(location.search);
-const id = Number(params.get('id'));
+const parametros = new URLSearchParams(location.search);
+const id = Number(parametros.get('id'));
 const pokemon = buscarPorId(id);
+
+const ficha = document.querySelector('#ficha-pokemon');
+const carrusel = document.querySelector('#carrusel .carrusel');
+
+if (!pokemon) {
+  ficha.innerHTML = '<h1>No encontramos ese Pokémon</h1><p class="volver"><a href="./">Volver a la lista</a></p>';
+} else {
+  document.title = `Pokédex - ${pokemon.nombre}`;
+  dibujarFicha(pokemon);
+  dibujarCarrusel(pokemon);
+}
 
 function mayus(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
 
@@ -46,6 +51,15 @@ function dibujarFicha(p) {
   ficha.innerHTML = `
       <h1><span>${numeroPokedex(p.id)}</span> ${p.nombre}</h1>
 
+      <nav id="indice-ficha">
+        <ul>
+          <li><a href="#detalles">Detalles</a></li>
+          <li><a href="#habilidades">Habilidades</a></li>
+          <li><a href="#estadisticas">Estadísticas</a></li>
+          <li><a href="#mas-informacion">Más información</a></li>
+        </ul>
+      </nav>
+
       <p>${p.descripcion}</p>
 
       <div class="ficha-pokemon__resumen">
@@ -73,7 +87,7 @@ function dibujarFicha(p) {
         <section id="habilidades" class="ficha-pokemon__habilidades">
           <h2>Habilidades</h2>
           <dl>
-            ${habilidades}
+${habilidades}
           </dl>
         </section>
       </div>
@@ -103,12 +117,36 @@ function dibujarFicha(p) {
             </tr>
           </tfoot>
         </table>
-      </section>`;
+      </section>
+
+      <section id="mas-informacion">
+        <h2>Más información</h2>
+        <h3>¿Cómo se leen estas estadísticas?</h3>
+        <p>Cada número de la tabla es un valor base, en una escala que en la práctica va de 5 a 255. ${lectura}</p>
+        <h3>¿Qué es una habilidad oculta?</h3>
+        <p>Es una habilidad que el Pokémon puede tener en lugar de la habitual, pero que no aparece por métodos normales de captura. En la ficha la marcamos con la palabra <em>oculta</em> entre paréntesis.</p>
+        <h3>¿De dónde salieron estos datos?</h3>
+        <p>Las ilustraciones vienen del repositorio público de PokeAPI y los datos de la misma PokeAPI. Los enlaces completos están en el pie de esta página.</p>
+      </section>
+
+      <p><a href="https://bulbapedia.bulbagarden.net/wiki/${p.nombre}_(Pokémon)" target="_blank" rel="noopener">Ver ficha completa en Bulbapedia</a> (se abre en una pestaña nueva)</p>`;
 }
 
-if (!pokemon) {
-  ficha.innerHTML = '<h1>No encontramos ese Pokémon</h1><p><a href="./">Volver</a></p>';
-} else {
-  document.title = `Pokedex — ${pokemon.nombre}`;
-  dibujarFicha(pokemon);
+function dibujarCarrusel(p) {
+  if (!carrusel) return;
+  const i = pokedex.findIndex((x) => x.id === p.id);
+  carrusel.replaceChildren();
+  for (let j = i - 2; j <= i + 2; j++) {
+    if (j < 0 || j >= pokedex.length) continue;
+    const vecino = pokedex[j];
+    const li = document.createElement('li');
+    li.className = 'carrusel__item';
+    if (vecino.id === p.id) {
+      li.classList.add('carrusel__item--activo');
+      li.innerHTML = `<img src="assets/pokeball.svg" alt="Estás viendo ${numeroPokedex(vecino.id)} ${vecino.nombre}" width="40" height="40">`;
+    } else {
+      li.innerHTML = `<a href="detalle.html?id=${vecino.id}"><img src="assets/pokeball-inactiva.svg" alt="Ir a ${numeroPokedex(vecino.id)} ${vecino.nombre}" width="32" height="32"></a>`;
+    }
+    carrusel.append(li);
+  }
 }
