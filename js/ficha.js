@@ -12,48 +12,103 @@ import { pokedex, buscarPorId, numeroPokedex, totalStats } from './datos.js';
 const ficha = document.querySelector('#ficha-pokemon');          // el <article> vacío
 const carrusel = document.querySelector('#carrusel .carrusel');  // el <ul> del carrusel
 
-// Prueba de que el módulo cargó bien (se borra cuando empecemos):
-console.log('ficha.js cargó.');
+const params = new URLSearchParams(location.search);
+const id = Number(params.get('id'));
+const pokemon = buscarPorId(id);
 
+function mayus(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
 
-// -------------------------------------------------------------
-// PASO 1 — leer el id de la dirección y buscar el Pokémon
-//   Pistas:
-//     - new URLSearchParams(location.search)  -> leer lo que va tras el "?"
-//     - .get('id')                            -> saca el valor (es texto)
-//     - Number(...)                           -> pasarlo a número
-//     - buscarPorId(id)                       -> encontrar el Pokémon
-//     - if (!pokemon) { ... }                 -> si no existe, mostrar un mensaje
-//       si existe: document.title = `Pokédex - ${pokemon.nombre}`
-//                  y llamar a dibujarFicha(pokemon) y dibujarCarrusel(pokemon)
-// -------------------------------------------------------------
+function dibujarFicha(p) {
+  const tipos = p.tipos.map((t) => `<span class="tipo tipo--${t}">${mayus(t)}</span>`).join(' ');
 
+  const evolucion = p.evolucion
+    .map((n) => n === p.nombre
+      ? `<li class="cadena-evolutiva__actual" aria-current="true">${n}</li>`
+      : `<li>${n}</li>`)
+    .join('\n          ');
 
-// -------------------------------------------------------------
-// PASO 2 — dibujarFicha(p)
-//   Arma TODO el contenido de la ficha con innerHTML (es un bloque grande).
-//   Es seguro porque los datos son NUESTROS (de datos.js), no de un usuario.
-//   Pistas:
-//     - ficha.innerHTML = `...`   con template literal (comillas `)
-//     - meter los datos con ${p.nombre}, ${numeroPokedex(p.id)}, etc.
-//     - para los tipos / habilidades / estadísticas: p.tipos.map(...),
-//       p.habilidades.map(...), Object.values(p.stats).map(...)
-//     - usar las MISMAS clases del HTML original (ficha-pokemon__resumen,
-//       stats-table, cadena-evolutiva, tipo--agua, ...) para que el CSS funcione
-//     - el total con totalStats(p)
-// -------------------------------------------------------------
+  const habilidades = p.habilidades
+    .map((h) => `          <dt>${h.nombre}${h.oculta ? ' <em>(oculta)</em>' : ''}</dt>\n          <dd>${h.descripcion}</dd>`)
+    .join('\n');
 
+  const celdas = Object.values(p.stats)
+    .map((v) => `<td style="--valor: ${v}">${v}</td>`)
+    .join('\n                ');
 
-// -------------------------------------------------------------
-// PASO 3 — dibujarCarrusel(p)
-//   Muestra 5 "pokébolas": dos antes, el actual y dos después.
-//   Es CIRCULAR: si estás en el primero, el anterior es el último.
-//   Pistas:
-//     - const n = pokedex.length
-//     - const i = pokedex.findIndex((x) => x.id === p.id)  -> posición actual
-//     - carrusel.replaceChildren()  -> vaciar antes de dibujar
-//     - for (let k = -2; k <= 2; k++) { const j = (i + k + n) % n; ... }
-//           el % (resto) hace que el índice "dé la vuelta"
-//     - k === 0 es el activo; los demás son enlaces a detalle.html?id=...
-//     - li.dataset.pos = k   -> lo usa el CSS para colocar el arco
-// -------------------------------------------------------------
+  // Frase de "cómo se leen las estadísticas", armada con los propios datos
+  const etiquetas = { hp: 'Puntos de Salud', ataque: 'Ataque', defensa: 'Defensa',
+    ataqueEsp: 'Ataque Especial', defensaEsp: 'Defensa Especial', velocidad: 'Velocidad' };
+  const entradas = Object.entries(p.stats);
+  const alta = entradas.reduce((a, b) => (b[1] > a[1] ? b : a));
+  const baja = entradas.reduce((a, b) => (b[1] < a[1] ? b : a));
+  const lectura = `${p.nombre} destaca en ${etiquetas[alta[0]]} (${alta[1]}) y flojea en ${etiquetas[baja[0]]} (${baja[1]}).`;
+
+  ficha.innerHTML = `
+      <h1><span>${numeroPokedex(p.id)}</span> ${p.nombre}</h1>
+
+      <p>${p.descripcion}</p>
+
+      <div class="ficha-pokemon__resumen">
+        <figure class="ficha-pokemon__imagen">
+          <img src="assets/${p.slug}.png" alt="${p.nombre}, un Pokémon de tipo ${p.tipos.join(' y ')}" width="300" height="300">
+          <figcaption>${p.nombre}, el ${p.genus}</figcaption>
+        </figure>
+
+        <section id="detalles" class="ficha-pokemon__detalles">
+          <h2>Detalles</h2>
+          <dl>
+            <dt>Peso</dt>
+            <dd>${p.peso.toFixed(1)} kg</dd>
+            <dt>Tamaño</dt>
+            <dd>${p.tamano.toFixed(1)} m</dd>
+            <dt>Tipo</dt>
+            <dd>${tipos}</dd>
+          </dl>
+          <h3>Cadena evolutiva</h3>
+          <ol class="cadena-evolutiva">
+          ${evolucion}
+          </ol>
+        </section>
+
+        <section id="habilidades" class="ficha-pokemon__habilidades">
+          <h2>Habilidades</h2>
+          <dl>
+            ${habilidades}
+          </dl>
+        </section>
+      </div>
+
+      <section id="estadisticas">
+        <h2>Estadísticas</h2>
+        <table class="stats-table">
+          <caption>Estadísticas base de ${p.nombre}</caption>
+          <thead>
+            <tr>
+              <th abbr="PS">Puntos de Salud</th>
+              <th abbr="ATQ">Ataque</th>
+              <th abbr="DEF">Defensa</th>
+              <th abbr="AT. ESP.">Ataque Especial</th>
+              <th abbr="DEF. ESP.">Defensa Especial</th>
+              <th abbr="VEL">Velocidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                ${celdas}
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="stats-table__total">
+              <td colspan="6">Total: ${totalStats(p)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>`;
+}
+
+if (!pokemon) {
+  ficha.innerHTML = '<h1>No encontramos ese Pokémon</h1><p><a href="./">Volver</a></p>';
+} else {
+  document.title = `Pokedex — ${pokemon.nombre}`;
+  dibujarFicha(pokemon);
+}

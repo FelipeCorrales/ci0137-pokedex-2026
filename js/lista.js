@@ -15,7 +15,7 @@ const form = document.querySelector('#buscador form');    // el formulario
 const contador = document.querySelector('.contador');     // "10 Pokémon" (si existe)
 
 // Prueba de que el módulo cargó bien (se borra cuando empecemos):
-console.log('lista.js cargó. Pokémon en datos:', pokedex.length);
+// console.log('lista.js cargó. Pokémon en datos:', pokedex.length);
 
 
 // -------------------------------------------------------------
@@ -31,36 +31,66 @@ console.log('lista.js cargó. Pokémon en datos:', pokedex.length);
 //     - a.append(img, numero, nombre)   -> colgar los hijos; luego li.append(a)
 //     - return li
 // -------------------------------------------------------------
+function crearTarjeta(pokemon) {
+  const li = document.createElement('li');
+  li.className = 'pokemon-card';
 
+  const a = document.createElement('a');
+  a.className = 'pokemon-card__link';
+  a.href = `detalle.html?id=${pokemon.id}`;
 
-// -------------------------------------------------------------
-// PASO 2 — dibujar(listaPokemon)
-//   Pinta en pantalla las tarjetas de la lista que se le pase.
-//   Pistas:
-//     - lista.replaceChildren()        -> primero VACIAR el <ul>
-//     - for (const pokemon of listaPokemon) { ... }  -> recorrer
-//     - lista.append(crearTarjeta(pokemon))          -> colgar cada tarjeta
-//     - (opcional) actualizar el contador y mostrar un
-//       mensaje si la lista viene vacía
-// -------------------------------------------------------------
+  const img = document.createElement('img');
+  img.className = 'pokemon-card__imagen';
+  img.src = `assets/${pokemon.slug}.png`;
+  img.alt = pokemon.nombre;
+  img.width = 96;
+  img.height = 96;
 
+  const numero = document.createElement('span');
+  numero.className = 'pokemon-card__numero';
+  numero.textContent = numeroPokedex(pokemon.id);
 
-// -------------------------------------------------------------
-// PASO 3 — filtrar()  +  eventos del formulario
-//   Lee los criterios del formulario y devuelve la lista filtrada.
-//   Pistas:
-//     - new FormData(form)              -> leer todos los campos
-//     - datos.get('nombre'), datos.get('tipo'), etc.
-//     - pokedex.filter((p) => { ... })  -> dejar solo los que cumplen
-//     - .sort(...)                      -> ordenar segun "Ordenar por"
-//     - quitar tildes antes de comparar (p. ej. una función normalizar)
-//
-//   Y conectar el formulario con el código (EVENTOS):
-//     - form.addEventListener('submit', (e) => { e.preventDefault(); dibujar(filtrar()); })
-//           preventDefault evita que la página se recargue
-//     - form.addEventListener('input', () => dibujar(filtrar()))  -> filtrar en vivo
-// -------------------------------------------------------------
+  const nombre = document.createElement('span');
+  nombre.className = 'pokemon-card__nombre';
+  nombre.textContent = pokemon.nombre;
 
+  a.append(img, numero, nombre);
+  li.append(a);
 
-// Al final: primer dibujado al cargar la página
-//   dibujar(filtrar());   // (o dibujar(pokedex) mientras no estén los filtros)
+  return li;
+}
+
+function dibujar(listaPokemon) {
+  lista.replaceChildren();
+  for (const pokemon of listaPokemon) {
+    lista.append(crearTarjeta(pokemon));
+  }
+}
+
+dibujar(pokedex);
+
+// eléctrico o electrico se comparan igual
+function normalizar(texto) {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function filtrar() {
+  const datos = new FormData(form); // Leemos los datos del formulario
+  const texto = normalizar(datos.get('nombre') ??''); // Normalizamos el texto del input'');
+  const tipo = datos.get('tipo') ?? ''; // Leemos el tipo seleccionado
+  const soloCapturados = datos.get('capturados') === 'on'; // Checkbox
+  const etapa = datos.get('etapa') ?? 'todas'; // Leemos la etapa seleccionada
+
+  return pokedex.filter((pokemon) => {
+    if (texto && !normalizar(pokemon.nombre).includes(texto)) return false;
+    if (tipo && !pokemon.tipos.includes(tipo)) return false;
+    if (soloCapturados && !pokemon.capturado) return false;
+    if (etapa !== 'todas' && pokemon.etapa !== etapa) return false;
+    return true;
+  });
+}
+
+form.addEventListener('submit', (event) => { event.preventDefault(); dibujar(filtrar()); });
+// form.addEventListener('reset', () => { setTimeout(() => dibujar(filtrar()), 0); });
+form.addEventListener('input', () => { dibujar(filtrar()); });
+dibujar(filtrar());
