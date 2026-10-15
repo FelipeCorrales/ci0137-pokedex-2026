@@ -134,14 +134,18 @@ ${habilidades}
 
 function dibujarCarrusel(p) {
   if (!carrusel) return;
+  const n = pokedex.length;
   const i = pokedex.findIndex((x) => x.id === p.id);
   carrusel.replaceChildren();
-  for (let j = i - 2; j <= i + 2; j++) {
-    if (j < 0 || j >= pokedex.length) continue;
+  // Siempre 5: dos antes, el actual y dos después. Es circular: si estás en el
+  // primero, el "anterior" es el último (y al revés). El operador % da la vuelta.
+  for (let k = -2; k <= 2; k++) {
+    const j = (i + k + n) % n;          // índice que da la vuelta (circular)
     const vecino = pokedex[j];
     const li = document.createElement('li');
     li.className = 'carrusel__item';
-    if (vecino.id === p.id) {
+    li.dataset.pos = k;                  // -2..2: lo usa el CSS para el arco
+    if (k === 0) {
       li.classList.add('carrusel__item--activo');
       li.innerHTML = `<img src="assets/pokeball.svg" alt="Estás viendo ${numeroPokedex(vecino.id)} ${vecino.nombre}" width="40" height="40">`;
     } else {
